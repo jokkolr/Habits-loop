@@ -3,266 +3,344 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitLoop - Recovery Dashboard</title>
+  <title>HabitLoop - Build & Break Habits</title>
   <style>
+    :root {
+      --bg: #f9fafc;
+      --text: #222;
+      --accent: #4CAF50;
+      --nav-bg: #fff;
+      --card-bg: #fff;
+      --shadow: rgba(0,0,0,0.1);
+    }
+    body.dark {
+      --bg: #121212;
+      --text: #f9f9f9;
+      --accent: #66BB6A;
+      --nav-bg: #1e1e1e;
+      --card-bg: #1e1e1e;
+      --shadow: rgba(255,255,255,0.05);
+    }
+    * {margin:0;padding:0;box-sizing:border-box;}
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f5f9;
-      margin: 0;
-      padding: 20px;
+      font-family: 'Arial', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+    nav {
+      background: var(--nav-bg);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px var(--shadow);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    nav .links {display: flex; gap: 1rem;}
+
+    /* Updated button styles */
+    nav a, nav button {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    nav a:hover, nav button:hover {
+      background: linear-gradient(135deg, #45a049, #3e8e41);
+      transform: scale(1.05);
+    }
+
+    #menuToggle {display:none;flex-direction:column;gap:4px;cursor:pointer;}
+    #menuToggle div {width:24px;height:3px;background:var(--text);}
+
+    .mobileMenu {
+      display:none;flex-direction:column;position:absolute;top:60px;right:0;
+      background:var(--nav-bg);width:220px;box-shadow:0 2px 5px var(--shadow);
+      transform:translateX(100%);transition:transform 0.3s ease-in-out;
+      padding:1rem;
+    }
+    .mobileMenu.open {display:flex;transform:translateX(0);}
+    .mobileMenu a, .mobileMenu button {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: #fff;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 25px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    .mobileMenu a:hover, .mobileMenu button:hover {
+      background: linear-gradient(135deg, #45a049, #3e8e41);
+      transform: scale(1.05);
+    }
+
+    section {
+      max-width: 900px;
+      margin: 100px auto 20px;
+      padding: 1rem;
       text-align: center;
     }
-    h1, h2 { color: #222; font-size: 1.5em; }
-    select, button {
-      padding: 10px;
-      margin: 8px;
+    h1, h2, h3 { color: var(--accent); margin-bottom: 1rem; }
+    select, textarea, button {
+      margin-top: 1rem;
+      padding: 0.8rem;
       border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-      cursor: pointer;
-      max-width: 90%;
-    }
-    button {
-      background: #00796b;
-      color: white;
-      border: none;
-    }
-    button:hover { background: #004d40; }
-    .plan-box, .journal-box, .quote-box {
-      background: white;
-      padding: 15px;
-      margin: 15px auto;
-      border-radius: 8px;
-      max-width: 600px;
-      text-align: left;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border:1px solid #ccc;
       width: 90%;
+      max-width: 400px;
+      font-size: 1rem;
     }
-    .plan-box { background: #fff3cd; }
-    .quote-box { background: #e3f2fd; font-style: italic; color: #1565c0; text-align: center; }
-    textarea {
-      width: 100%;
-      height: 80px;
-      margin-top: 5px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      resize: none;
-    }
-
-    /* Risk Modal */
-    #riskModal, #galleryModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      overflow: auto;
-    }
-    #riskModalContent, #galleryModal > div {
-      background: white;
-      width: 90%;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 15px;
-      border-radius: 10px;
+    .card {
+      background: var(--card-bg);
+      margin: 1.5rem auto;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px var(--shadow);
       text-align: left;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    #riskModalContent.warning {
-      background: #330000;
-      color: #ffdddd;
-      border: 2px solid red;
+    @keyframes fadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+    ul {margin-top:1rem;padding-left:1rem;}
+    ul li {
+      margin-bottom: 0.8rem;
+      list-style: none;
+      position: relative;
+      padding-left: 1.5rem;
     }
-    #riskModalContent h2 { color: #b71c1c; font-size: 1.3em; }
-    #riskModalContent.warning h2 { color: #ff4444; }
-    .blurred {
-      filter: blur(8px);
-      transition: filter 0.3s;
-      max-width: 100%;
-      margin: 10px 0;
-    }
-    .blurred.revealed { filter: blur(0); }
-
-    /* Clarewell Gallery iframe */
-    #galleryModal iframe {
-      width: 100%; 
-      height: 80vh;
-      border: none;
-    }
-    #galleryModal button {
+    ul li::before {
+      content: "✔";
+      color: var(--accent);
       position: absolute;
-      top: 10px; right: 10px;
-      background: red; color: white;
-      padding: 8px 12px;
-      border: none; border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.9em;
+      left: 0;
+      font-size: 1.1rem;
     }
-
-    /* Mobile Optimizations */
-    @media (max-width: 600px) {
-      h1, h2 { font-size: 1.2em; }
-      select, button { font-size: 0.9em; padding: 8px; }
-      .plan-box, .journal-box, .quote-box { width: 95%; padding: 10px; }
-      #riskModalContent, #galleryModal > div { width: 95%; margin: 30px auto; }
-      #galleryModal iframe { height: 70vh; }
+    .step-number {
+      display:inline-block;
+      background: var(--accent);
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 50%;
+      margin-right: 8px;
+      font-size: 0.8rem;
+    }
+    .progress-bar {
+      background:#ddd;
+      border-radius:5px;
+      overflow:hidden;
+      height:20px;
+      margin-top:10px;
+    }
+    .progress-fill {
+      background:var(--accent);
+      width:0;
+      height:100%;
+      transition:width 1s ease;
+    }
+    .sti-warning {
+      margin-top:1rem;
+      text-align:center;
+      font-size:0.9rem;
+    }
+    .sti-warning a {color:red;font-weight:bold;text-decoration:none;}
+    footer {text-align:center;font-size:0.8rem;color:#888;padding:1rem;}
+    @media(max-width:768px){
+      nav .links{display:none;}
+      #menuToggle{display:flex;}
     }
   </style>
 </head>
 <body>
-  <h1>Welcome, <span id="username"></span>!</h1>
-  <h2>Select an Addiction for a Personalized Recovery Plan</h2>
-
-  <select id="addictionSelect" onchange="showPlan()">
-    <option value="drugs">Drugs</option>
-    <option value="alcohol">Alcohol</option>
-    <option value="porn">Porn</option>
-    <option value="gambling">Gambling</option>
-    <option value="phone">Phone Overuse</option>
-    <option value="smoking">Smoking</option>
-    <option value="riskySex">Risky Sexual Behaviors</option>
-  </select>
-
-  <div class="quote-box" id="dailyQuote"></div>
-  <div class="plan-box" id="planBox"></div>
-
-  <!-- Risk Modal -->
-  <div id="riskModal">
-    <div id="riskModalContent">
-      <h2>⚠ Think Before You Risk It</h2>
-      <div id="riskContent"></div>
-      <button onclick="toggleWarningMode()" id="toggleModeBtn">Show Warning Mode (Visual)</button>
-      <button onclick="openGallery()">See Real STI Images</button>
-      <button onclick="proceedAnyway()">Proceed Anyway</button>
-      <button onclick="closeRiskModal()">Close</button>
+  <nav>
+    <div style="font-weight:bold;">HabitLoop</div>
+    <div class="links">
+      <a href="#home">Home</a>
+      <a href="#habits">Habits</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#journal">Journal</a>
+      <button id="themeToggle">Theme</button>
     </div>
-  </div>
-
-  <!-- Clarewell Gallery Popup -->
-  <div id="galleryModal">
-    <div>
-      <iframe src="https://clarewellclinics.co.uk/sti/symptoms/pictures/"></iframe>
-      <button onclick="closeGallery()">Close</button>
+    <div id="menuToggle"><div></div><div></div><div></div></div>
+    <div class="mobileMenu" id="mobileMenu">
+      <a href="#home">Home</a>
+      <a href="#habits">Habits</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#journal">Journal</a>
+      <button id="themeToggleMobile">Theme</button>
     </div>
-  </div>
+  </nav>
 
-  <div class="journal-box">
-    <h3>Your Daily Journal</h3>
-    <textarea id="journalText" placeholder="How are you feeling today? What did you achieve?"></textarea>
-    <button onclick="saveJournal()">Save Entry</button>
-  </div>
+  <section id="home">
+    <h1>Welcome to HabitLoop</h1>
+    <p>Use science-backed steps to <strong>build good habits</strong> and <strong>break bad ones</strong>.</p>
+  </section>
+
+  <section id="habits">
+    <h2>Select a Habit</h2>
+    <select id="habitSelect">
+      <option value="">-- Choose a Habit --</option>
+      <optgroup label="Good Habits">
+        <option value="reading">Reading Daily</option>
+        <option value="exercise">Exercising</option>
+        <option value="waking">Waking Up Early</option>
+      </optgroup>
+      <optgroup label="Bad Habits">
+        <option value="drugs">Drug Addiction</option>
+        <option value="porn">Porn Addiction</option>
+        <option value="risky">Risky Sexual Behavior</option>
+      </optgroup>
+    </select>
+    <div class="card" id="habitGuide"></div>
+    <div class="sti-warning" id="stiWarning" style="display:none;">
+      <p>Before risky behaviors, <strong>educate yourself</strong>. See STI awareness images:</p>
+      <a href="https://clarewellclinics.co.uk/sti/symptoms/pictures/" target="_blank">STI Gallery</a>
+    </div>
+  </section>
+
+  <section id="dashboard">
+    <h2>Your Progress Dashboard</h2>
+    <div id="progressList"></div>
+  </section>
+
+  <section id="journal">
+    <h2>Your Journal</h2>
+    <textarea id="journalEntry" rows="6" placeholder="Write your progress or thoughts..."></textarea><br>
+    <button onclick="saveJournal()">Save</button>
+    <p id="saveMsg" style="color:var(--accent);"></p>
+  </section>
+
+  <footer>HabitLoop © 2025</footer>
 
   <script>
-    const user = localStorage.getItem('habitloopUser') || "Friend";
-    document.getElementById('username').innerText = user;
-
-    const quotes = [
-      "Small habits every day create big change.",
-      "Each day is a new chance to start fresh.",
-      "Progress, not perfection, leads to success.",
-      "You are stronger than your urges.",
-      "Your future self will thank you for today."
-    ];
-
-    const plans = {
-      drugs: [
-        { step: "Clear Your Space", detail: "Remove all drugs and tools linked to usage." },
-        { step: "Avoid Triggers", detail: "Stop visiting places and people connected to your drug use." },
-        { step: "Replacement Habits", detail: "Start a hobby, exercise, or volunteer to replace old routines." },
-        { step: "Seek Support", detail: "Join a support group or talk to a mentor regularly." },
-        { step: "Track Progress", detail: "Write down your wins daily, no matter how small." }
-      ],
-      porn: [
-        { step: "Use Blockers", detail: `Install:
-          <br>- <a href="https://getcoldturkey.com" target="_blank">Cold Turkey</a>
-          <br>- <a href="https://cleanbrowsing.org/filters/adult" target="_blank">CleanBrowsing DNS</a>
-          <br>- <a href="https://blocksite.co/" target="_blank">BlockSite (Android/iOS)</a>` },
-        { step: "Control Devices", detail: "Keep phones and laptops out of your bedroom at night." },
-        { step: "Replace Urges", detail: "Go for a walk, read, or exercise when cravings hit." },
-        { step: "Social Time", detail: "Spend time outdoors or with friends to break isolation." },
-        { step: "Reflect Daily", detail: "Journal each night and celebrate milestones weekly." }
-      ]
+    const habits = {
+      reading: {
+        intro:"If you want to build a habit of reading, here’s what you should do:",
+        plan:[
+          "Make it Obvious: Place your book somewhere visible (bed, desk).",
+          "Make it Attractive: Choose books you actually enjoy.",
+          "Make it Easy: Start with 5 minutes a day.",
+          "Make it Satisfying: Track streaks and reward milestones."
+        ],streak:0
+      },
+      exercise:{
+        intro:"If you want to build a habit of exercising, here’s what you should do:",
+        plan:[
+          "Make it Obvious: Lay out workout clothes.",
+          "Make it Attractive: Play music or find a workout buddy.",
+          "Make it Easy: Begin with 10 minutes a day.",
+          "Make it Satisfying: Celebrate weekly wins."
+        ],streak:0
+      },
+      waking:{
+        intro:"If you want to wake up early, here’s what you should do:",
+        plan:[
+          "Make it Obvious: Put alarm across the room.",
+          "Make it Attractive: Plan something fun for mornings.",
+          "Make it Easy: Shift bedtime/wake time by 15 minutes daily.",
+          "Make it Satisfying: Track and reward progress."
+        ],streak:0
+      },
+      drugs:{
+        intro:"If you want to break drug addiction, here’s how to weaken it:",
+        plan:[
+          "Make it Invisible: Avoid triggers and risky areas.",
+          "Make it Unattractive: Think about long-term harm.",
+          "Make it Difficult: Cut access and seek support.",
+          "Make it Unsatisfying: Stay accountable to others."
+        ],streak:0
+      },
+      porn:{
+        intro:"If you want to stop porn addiction, here’s how to weaken it:",
+        plan:[
+          "Make it Invisible: Use website blockers.",
+          "Make it Unattractive: Focus on harm to your mind and relationships.",
+          "Make it Difficult: Restrict access and add accountability.",
+          "Make it Unsatisfying: Track urges and consequences."
+        ],streak:0
+      },
+      risky:{
+        intro:"If you want to avoid risky sexual behaviors, here’s how:",
+        plan:[
+          "Make it Invisible: Avoid risky parties/places.",
+          "Make it Unattractive: Learn about STI risks.",
+          "Make it Difficult: Avoid drugs/alcohol before intimacy.",
+          "Make it Unsatisfying: Use a support system."
+        ],streak:0
+      }
     };
+    const habitSelect=document.getElementById('habitSelect');
+    const guideDiv=document.getElementById('habitGuide');
+    const stiWarning=document.getElementById('stiWarning');
+    const progressList=document.getElementById('progressList');
 
-    function showPlan() {
-      const addiction = document.getElementById('addictionSelect').value;
-      if (addiction === 'riskySex') { openRiskModal(); return; }
-      const plan = plans[addiction] || [];
-      const html = plan.map(step => `<details><summary>${step.step}</summary><p>${step.detail}</p></details>`).join('');
-      document.getElementById('planBox').innerHTML = `<h3>${capitalize(addiction)} Recovery Plan</h3>${html}`;
-      showQuote(); loadJournal();
+    function loadDashboard(){
+      progressList.innerHTML='';
+      for(let h in habits){
+        const streak=habits[h].streak;
+        const div=document.createElement('div');
+        div.className='card';
+        div.innerHTML=`<h3>${h.charAt(0).toUpperCase()+h.slice(1)}</h3>
+          <p>Days: <span class="counter" data-target="${streak}">0</span></p>
+          <div class="progress-bar"><div class="progress-fill"></div></div>`;
+        progressList.appendChild(div);
+      }
+      animateCounters();
     }
-
-    function showQuote() {
-      const quote = quotes[Math.floor(Math.random() * quotes.length)];
-      document.getElementById('dailyQuote').innerText = `"${quote}"`;
+    function animateCounters(){
+      document.querySelectorAll('.counter').forEach(counter=>{
+        const target=+counter.dataset.target;
+        let count=0;
+        const update=()=>{
+          count++;
+          counter.textContent=count;
+          if(count<target) requestAnimationFrame(update);
+        };
+        update();
+      });
+      document.querySelectorAll('.progress-fill').forEach((fill,i)=>{
+        const target=Object.values(habits)[i].streak*10;
+        setTimeout(()=>{fill.style.width=`${Math.min(target,100)}%`;},300);
+      });
     }
-
-    function saveJournal() {
-      const addiction = document.getElementById('addictionSelect').value;
-      localStorage.setItem(`${addiction}Journal`, document.getElementById('journalText').value);
-      alert("Journal saved!");
+    habitSelect.addEventListener('change',()=>{
+      const val=habitSelect.value;
+      if(!val){guideDiv.innerHTML='';stiWarning.style.display='none';return;}
+      const h=habits[val];
+      const steps=h.plan.map((p,i)=>`<li><span class="step-number">${i+1}</span>${p}</li>`).join('');
+      guideDiv.innerHTML=`<h3>${habitSelect.options[habitSelect.selectedIndex].text}</h3>
+        <p>${h.intro}</p><ul>${steps}</ul>`;
+      stiWarning.style.display=(val==='risky')?'block':'none';
+    });
+    function saveJournal(){
+      localStorage.setItem('habitJournal',document.getElementById('journalEntry').value);
+      document.getElementById('saveMsg').textContent='Journal saved!';
+      setTimeout(()=>{document.getElementById('saveMsg').textContent='';},2000);
     }
-
-    function loadJournal() {
-      const addiction = document.getElementById('addictionSelect').value;
-      document.getElementById('journalText').value = localStorage.getItem(`${addiction}Journal`) || "";
-    }
-
-    function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
-
-    // Risky Sexual Behaviors Logic
-    function openRiskModal() { document.getElementById("riskModal").style.display = "block"; resetToProfessionalMode(); }
-    function closeRiskModal() { document.getElementById("riskModal").style.display = "none"; }
-    function toggleWarningMode() {
-      const modal = document.getElementById('riskModalContent');
-      const content = document.getElementById('riskContent');
-      const btn = document.getElementById('toggleModeBtn');
-      if (!modal.classList.contains('warning')) {
-        modal.classList.add('warning');
-        content.innerHTML = `
-          <h3 style="color:#ff9999;">WARNING MODE</h3>
-          <p>Risky sex can lead to <strong>painful, life-changing infections</strong>.  
-          Real medical images (click to reveal):</p>
-          <img src="https://www.mayoclinic.org/-/media/kcms/gbs/patient-consumer/images/2016/10/13/12/55/stds-sls-20076923-0015-10-1.jpg" class="blurred" id="stiImage" alt="STI Example">
-          <p><small>Tap the image to unblur (graphic content)</small></p>
-          <ul>
-            <li>⚠ Over <strong>1 million STIs</strong> acquired daily (WHO)</li>
-            <li>⚠ Some cause <strong>infertility or lifelong issues</strong></li>
-            <li>⚠ Treatment is <strong>costly and stressful</strong></li>
-          </ul>`;
-        btn.textContent = "Switch to Professional Mode";
-        document.getElementById('stiImage').onclick = function() { this.classList.toggle('revealed'); };
-      } else { resetToProfessionalMode(); }
-    }
-    function resetToProfessionalMode() {
-      const modal = document.getElementById('riskModalContent');
-      const content = document.getElementById('riskContent');
-      const btn = document.getElementById('toggleModeBtn');
-      modal.classList.remove('warning');
-      content.innerHTML = `
-        <p>Unprotected or risky sexual behavior can lead to <strong>serious infections and lifelong consequences</strong>.  
-        Protect yourself — or at least <strong>know the risks before deciding.</strong></p>
-        <h3>Learn the Facts</h3>
-        <ul>
-          <li><a href="https://www.mayoclinic.org/diseases-conditions/sexually-transmitted-diseases-stds/multimedia/stds/sls-20076923" target="_blank">Mayo Clinic (Images)</a></li>
-          <li><button onclick="openGallery()" style="background:red; color:white; padding:5px 10px; border:none; border-radius:5px;">See Clarewell STI Gallery</button></li>
-        </ul>`;
-      btn.textContent = "Show Warning Mode (Visual)";
-    }
-    function proceedAnyway() {
-      document.getElementById('planBox').innerHTML = `
-        <h3>Risk Reduction Plan</h3>
-        <p>If you still choose to engage, use <strong>protection every time</strong>, get tested regularly, and avoid multiple partners.</p>`;
-      closeRiskModal();
-    }
-
-    // Clarewell Gallery Controls
-    function openGallery() { document.getElementById('galleryModal').style.display = 'block'; }
-    function closeGallery() { document.getElementById('galleryModal').style.display = 'none'; }
-
-    showPlan();
+    document.getElementById('journalEntry').value=localStorage.getItem('habitJournal')||'';
+    document.getElementById('themeToggle').addEventListener('click',()=>document.body.classList.toggle('dark'));
+    document.getElementById('themeToggleMobile').addEventListener('click',()=>document.body.classList.toggle('dark'));
+    const menuToggle=document.getElementById('menuToggle');
+    const mobileMenu=document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click',()=>mobileMenu.classList.toggle('open'));
+    document.querySelectorAll('.mobileMenu a,.mobileMenu button').forEach(link=>{
+      link.addEventListener('click',()=>mobileMenu.classList.remove('open'));
+    });
+    loadDashboard();
   </script>
 </body>
 </html>
