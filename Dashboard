@@ -41,8 +41,6 @@
       z-index: 1000;
     }
     nav .links {display: flex; gap: 1rem;}
-
-    /* Updated button styles */
     nav a, nav button {
       background: linear-gradient(135deg, #4CAF50, #45a049);
       border: none;
@@ -60,10 +58,8 @@
       background: linear-gradient(135deg, #45a049, #3e8e41);
       transform: scale(1.05);
     }
-
     #menuToggle {display:none;flex-direction:column;gap:4px;cursor:pointer;}
     #menuToggle div {width:24px;height:3px;background:var(--text);}
-
     .mobileMenu {
       display:none;flex-direction:column;position:absolute;top:60px;right:0;
       background:var(--nav-bg);width:220px;box-shadow:0 2px 5px var(--shadow);
@@ -82,11 +78,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       transition: all 0.3s ease;
     }
-    .mobileMenu a:hover, .mobileMenu button:hover {
-      background: linear-gradient(135deg, #45a049, #3e8e41);
-      transform: scale(1.05);
-    }
-
     section {
       max-width: 900px;
       margin: 100px auto 20px;
@@ -94,7 +85,7 @@
       text-align: center;
     }
     h1, h2, h3 { color: var(--accent); margin-bottom: 1rem; }
-    select, textarea, button {
+    select, textarea, input, button {
       margin-top: 1rem;
       padding: 0.8rem;
       border-radius: 5px;
@@ -110,59 +101,15 @@
       border-radius: 12px;
       box-shadow: 0 4px 10px var(--shadow);
       text-align: left;
-      animation: fadeIn 0.5s ease-in-out;
     }
-    @keyframes fadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
     ul {margin-top:1rem;padding-left:1rem;}
-    ul li {
-      margin-bottom: 0.8rem;
-      list-style: none;
-      position: relative;
-      padding-left: 1.5rem;
-    }
-    ul li::before {
-      content: "✔";
-      color: var(--accent);
-      position: absolute;
-      left: 0;
-      font-size: 1.1rem;
-    }
-    .step-number {
-      display:inline-block;
-      background: var(--accent);
-      color: #fff;
-      width: 22px;
-      height: 22px;
-      line-height: 22px;
-      text-align: center;
-      border-radius: 50%;
-      margin-right: 8px;
-      font-size: 0.8rem;
-    }
-    .progress-bar {
-      background:#ddd;
-      border-radius:5px;
-      overflow:hidden;
-      height:20px;
-      margin-top:10px;
-    }
-    .progress-fill {
-      background:var(--accent);
-      width:0;
-      height:100%;
-      transition:width 1s ease;
-    }
-    .sti-warning {
-      margin-top:1rem;
-      text-align:center;
-      font-size:0.9rem;
-    }
-    .sti-warning a {color:red;font-weight:bold;text-decoration:none;}
+    ul li {margin-bottom: 0.8rem;list-style: none;position: relative;padding-left: 1.5rem;}
+    ul li::before {content: "✔";color: var(--accent);position: absolute;left: 0;}
+    .progress-bar {background:#ddd;border-radius:5px;overflow:hidden;height:20px;margin-top:10px;}
+    .progress-fill {background:var(--accent);width:0;height:100%;transition:width 1s ease;}
     footer {text-align:center;font-size:0.8rem;color:#888;padding:1rem;}
-    @media(max-width:768px){
-      nav .links{display:none;}
-      #menuToggle{display:flex;}
-    }
+    @media(max-width:768px){nav .links{display:none;}#menuToggle{display:flex;}}
+    #authSection {display:none;}
   </style>
 </head>
 <body>
@@ -173,6 +120,7 @@
       <a href="#habits">Habits</a>
       <a href="#dashboard">Dashboard</a>
       <a href="#journal">Journal</a>
+      <button id="logoutBtn" style="display:none;">Logout</button>
       <button id="themeToggle">Theme</button>
     </div>
     <div id="menuToggle"><div></div><div></div><div></div></div>
@@ -182,165 +130,130 @@
       <a href="#dashboard">Dashboard</a>
       <a href="#journal">Journal</a>
       <button id="themeToggleMobile">Theme</button>
+      <button id="logoutBtnMobile" style="display:none;">Logout</button>
     </div>
   </nav>
 
-  <section id="home">
-    <h1>Welcome to HabitLoop</h1>
-    <p>Use science-backed steps to <strong>build good habits</strong> and <strong>break bad ones</strong>.</p>
+  <!-- Authentication -->
+  <section id="authSection">
+    <h2 id="authTitle">Login</h2>
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="handleAuth()">Submit</button><br>
+    <p id="authMsg"></p>
+    <button onclick="toggleAuthMode()">Switch to Sign Up</button>
   </section>
 
-  <section id="habits">
-    <h2>Select a Habit</h2>
-    <select id="habitSelect">
-      <option value="">-- Choose a Habit --</option>
-      <optgroup label="Good Habits">
-        <option value="reading">Reading Daily</option>
-        <option value="exercise">Exercising</option>
-        <option value="waking">Waking Up Early</option>
-      </optgroup>
-      <optgroup label="Bad Habits">
-        <option value="drugs">Drug Addiction</option>
-        <option value="porn">Porn Addiction</option>
-        <option value="risky">Risky Sexual Behavior</option>
-      </optgroup>
-    </select>
-    <div class="card" id="habitGuide"></div>
-    <div class="sti-warning" id="stiWarning" style="display:none;">
-      <p>Before risky behaviors, <strong>educate yourself</strong>. See STI awareness images:</p>
-      <a href="https://clarewellclinics.co.uk/sti/symptoms/pictures/" target="_blank">STI Gallery</a>
-    </div>
-  </section>
+  <!-- Main content (hidden until logged in) -->
+  <div id="mainContent" style="display:none;">
+    <section id="home">
+      <h1>Welcome to HabitLoop</h1>
+      <p>Use science-backed steps to build good habits and break bad ones.</p>
+    </section>
 
-  <section id="dashboard">
-    <h2>Your Progress Dashboard</h2>
-    <div id="progressList"></div>
-  </section>
+    <section id="habits">
+      <h2>Select a Habit</h2>
+      <select id="habitSelect">
+        <option value="">-- Choose a Habit --</option>
+        <optgroup label="Good Habits">
+          <option value="reading">Reading Daily</option>
+          <option value="exercise">Exercising</option>
+          <option value="waking">Waking Up Early</option>
+        </optgroup>
+        <optgroup label="Bad Habits">
+          <option value="drugs">Drug Addiction</option>
+          <option value="porn">Porn Addiction</option>
+          <option value="risky">Risky Sexual Behavior</option>
+        </optgroup>
+      </select>
+      <div class="card" id="habitGuide"></div>
+    </section>
 
-  <section id="journal">
-    <h2>Your Journal</h2>
-    <textarea id="journalEntry" rows="6" placeholder="Write your progress or thoughts..."></textarea><br>
-    <button onclick="saveJournal()">Save</button>
-    <p id="saveMsg" style="color:var(--accent);"></p>
-  </section>
+    <section id="dashboard">
+      <h2>Your Progress Dashboard</h2>
+      <div id="progressList"></div>
+    </section>
+
+    <section id="journal">
+      <h2>Your Journal</h2>
+      <textarea id="journalEntry" rows="6" placeholder="Write your thoughts..."></textarea><br>
+      <button onclick="saveJournal()">Save</button>
+      <p id="saveMsg" style="color:var(--accent);"></p>
+    </section>
+  </div>
 
   <footer>HabitLoop © 2025</footer>
 
   <script>
+    let isLogin = true;
     const habits = {
-      reading: {
-        intro:"If you want to build a habit of reading, here’s what you should do:",
-        plan:[
-          "Make it Obvious: Place your book somewhere visible (bed, desk).",
-          "Make it Attractive: Choose books you actually enjoy.",
-          "Make it Easy: Start with 5 minutes a day.",
-          "Make it Satisfying: Track streaks and reward milestones."
-        ],streak:0
-      },
-      exercise:{
-        intro:"If you want to build a habit of exercising, here’s what you should do:",
-        plan:[
-          "Make it Obvious: Lay out workout clothes.",
-          "Make it Attractive: Play music or find a workout buddy.",
-          "Make it Easy: Begin with 10 minutes a day.",
-          "Make it Satisfying: Celebrate weekly wins."
-        ],streak:0
-      },
-      waking:{
-        intro:"If you want to wake up early, here’s what you should do:",
-        plan:[
-          "Make it Obvious: Put alarm across the room.",
-          "Make it Attractive: Plan something fun for mornings.",
-          "Make it Easy: Shift bedtime/wake time by 15 minutes daily.",
-          "Make it Satisfying: Track and reward progress."
-        ],streak:0
-      },
-      drugs:{
-        intro:"If you want to break drug addiction, here’s how to weaken it:",
-        plan:[
-          "Make it Invisible: Avoid triggers and risky areas.",
-          "Make it Unattractive: Think about long-term harm.",
-          "Make it Difficult: Cut access and seek support.",
-          "Make it Unsatisfying: Stay accountable to others."
-        ],streak:0
-      },
-      porn:{
-        intro:"If you want to stop porn addiction, here’s how to weaken it:",
-        plan:[
-          "Make it Invisible: Use website blockers.",
-          "Make it Unattractive: Focus on harm to your mind and relationships.",
-          "Make it Difficult: Restrict access and add accountability.",
-          "Make it Unsatisfying: Track urges and consequences."
-        ],streak:0
-      },
-      risky:{
-        intro:"If you want to avoid risky sexual behaviors, here’s how:",
-        plan:[
-          "Make it Invisible: Avoid risky parties/places.",
-          "Make it Unattractive: Learn about STI risks.",
-          "Make it Difficult: Avoid drugs/alcohol before intimacy.",
-          "Make it Unsatisfying: Use a support system."
-        ],streak:0
-      }
+      reading:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
+      exercise:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
+      waking:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
+      drugs:{plan:["Make it Invisible","Make it Unattractive","Make it Difficult","Make it Unsatisfying"],streak:0},
+      porn:{plan:["Make it Invisible","Use Blockers","Make it Difficult","Make it Unsatisfying"],streak:0},
+      risky:{plan:["Make it Invisible","See STI Risks","Make it Difficult","Make it Unsatisfying"],streak:0}
     };
-    const habitSelect=document.getElementById('habitSelect');
-    const guideDiv=document.getElementById('habitGuide');
-    const stiWarning=document.getElementById('stiWarning');
-    const progressList=document.getElementById('progressList');
 
-    function loadDashboard(){
-      progressList.innerHTML='';
-      for(let h in habits){
-        const streak=habits[h].streak;
-        const div=document.createElement('div');
-        div.className='card';
-        div.innerHTML=`<h3>${h.charAt(0).toUpperCase()+h.slice(1)}</h3>
-          <p>Days: <span class="counter" data-target="${streak}">0</span></p>
-          <div class="progress-bar"><div class="progress-fill"></div></div>`;
-        progressList.appendChild(div);
+    function toggleAuthMode(){
+      isLogin = !isLogin;
+      document.getElementById('authTitle').textContent = isLogin ? "Login" : "Sign Up";
+      document.querySelector('#authSection button:last-of-type').textContent = isLogin ? "Switch to Sign Up" : "Switch to Login";
+    }
+
+    function handleAuth(){
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('authMsg');
+      if(!email || !password){msg.textContent="Please fill all fields.";return;}
+      if(isLogin){
+        const stored = JSON.parse(localStorage.getItem('user'));
+        if(stored && stored.email===email && stored.password===password){
+          loginSuccess();
+        } else {
+          msg.textContent="Invalid login details.";
+        }
+      } else {
+        const username=document.getElementById('username').value;
+        if(!username){msg.textContent="Enter username.";return;}
+        localStorage.setItem('user',JSON.stringify({username,email,password}));
+        msg.textContent="Account created! You can now login.";
+        toggleAuthMode();
       }
-      animateCounters();
     }
-    function animateCounters(){
-      document.querySelectorAll('.counter').forEach(counter=>{
-        const target=+counter.dataset.target;
-        let count=0;
-        const update=()=>{
-          count++;
-          counter.textContent=count;
-          if(count<target) requestAnimationFrame(update);
-        };
-        update();
-      });
-      document.querySelectorAll('.progress-fill').forEach((fill,i)=>{
-        const target=Object.values(habits)[i].streak*10;
-        setTimeout(()=>{fill.style.width=`${Math.min(target,100)}%`;},300);
-      });
+
+    function loginSuccess(){
+      document.getElementById('authSection').style.display="none";
+      document.getElementById('mainContent').style.display="block";
+      document.getElementById('logoutBtn').style.display="inline-block";
+      document.getElementById('logoutBtnMobile').style.display="inline-block";
     }
-    habitSelect.addEventListener('change',()=>{
-      const val=habitSelect.value;
-      if(!val){guideDiv.innerHTML='';stiWarning.style.display='none';return;}
-      const h=habits[val];
-      const steps=h.plan.map((p,i)=>`<li><span class="step-number">${i+1}</span>${p}</li>`).join('');
-      guideDiv.innerHTML=`<h3>${habitSelect.options[habitSelect.selectedIndex].text}</h3>
-        <p>${h.intro}</p><ul>${steps}</ul>`;
-      stiWarning.style.display=(val==='risky')?'block':'none';
-    });
+
+    document.getElementById('logoutBtn').addEventListener('click',logout);
+    document.getElementById('logoutBtnMobile').addEventListener('click',logout);
+    function logout(){
+      document.getElementById('authSection').style.display="block";
+      document.getElementById('mainContent').style.display="none";
+      document.getElementById('logoutBtn').style.display="none";
+      document.getElementById('logoutBtnMobile').style.display="none";
+    }
+
     function saveJournal(){
       localStorage.setItem('habitJournal',document.getElementById('journalEntry').value);
       document.getElementById('saveMsg').textContent='Journal saved!';
       setTimeout(()=>{document.getElementById('saveMsg').textContent='';},2000);
     }
-    document.getElementById('journalEntry').value=localStorage.getItem('habitJournal')||'';
+
+    // Theme toggle
     document.getElementById('themeToggle').addEventListener('click',()=>document.body.classList.toggle('dark'));
     document.getElementById('themeToggleMobile').addEventListener('click',()=>document.body.classList.toggle('dark'));
-    const menuToggle=document.getElementById('menuToggle');
-    const mobileMenu=document.getElementById('mobileMenu');
-    menuToggle.addEventListener('click',()=>mobileMenu.classList.toggle('open'));
-    document.querySelectorAll('.mobileMenu a,.mobileMenu button').forEach(link=>{
-      link.addEventListener('click',()=>mobileMenu.classList.remove('open'));
-    });
-    loadDashboard();
+
+    // Mobile menu
+    document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));
+
+    // Show login first if not logged in
+    document.getElementById('authSection').style.display="block";
   </script>
 </body>
 </html>
