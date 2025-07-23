@@ -1,259 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitLoop - Build & Break Habits</title>
-  <style>
-    :root {
-      --bg: #f9fafc;
-      --text: #222;
-      --accent: #4CAF50;
-      --nav-bg: #fff;
-      --card-bg: #fff;
-      --shadow: rgba(0,0,0,0.1);
-    }
-    body.dark {
-      --bg: #121212;
-      --text: #f9f9f9;
-      --accent: #66BB6A;
-      --nav-bg: #1e1e1e;
-      --card-bg: #1e1e1e;
-      --shadow: rgba(255,255,255,0.05);
-    }
-    * {margin:0;padding:0;box-sizing:border-box;}
-    body {
-      font-family: 'Arial', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: background 0.3s, color 0.3s;
-    }
-    nav {
-      background: var(--nav-bg);
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px var(--shadow);
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 1000;
-    }
-    nav .links {display: flex; gap: 1rem;}
-    nav a, nav button {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      color: #fff;
-      font-weight: bold;
-      font-size: 0.95rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    nav a:hover, nav button:hover {
-      background: linear-gradient(135deg, #45a049, #3e8e41);
-      transform: scale(1.05);
-    }
-    #menuToggle {display:none;flex-direction:column;gap:4px;cursor:pointer;}
-    #menuToggle div {width:24px;height:3px;background:var(--text);}
-    .mobileMenu {
-      display:none;flex-direction:column;position:absolute;top:60px;right:0;
-      background:var(--nav-bg);width:220px;box-shadow:0 2px 5px var(--shadow);
-      transform:translateX(100%);transition:transform 0.3s ease-in-out;
-      padding:1rem;
-    }
-    .mobileMenu.open {display:flex;transform:translateX(0);}
-    .mobileMenu a, .mobileMenu button {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: #fff;
-      padding: 0.8rem;
-      margin: 0.5rem 0;
-      border-radius: 25px;
-      text-align: center;
-      font-weight: bold;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: all 0.3s ease;
-    }
-    section {
-      max-width: 900px;
-      margin: 100px auto 20px;
-      padding: 1rem;
-      text-align: center;
-    }
-    h1, h2, h3 { color: var(--accent); margin-bottom: 1rem; }
-    select, textarea, input, button {
-      margin-top: 1rem;
-      padding: 0.8rem;
-      border-radius: 5px;
-      border:1px solid #ccc;
-      width: 90%;
-      max-width: 400px;
-      font-size: 1rem;
-    }
-    .card {
-      background: var(--card-bg);
-      margin: 1.5rem auto;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px var(--shadow);
-      text-align: left;
-    }
-    ul {margin-top:1rem;padding-left:1rem;}
-    ul li {margin-bottom: 0.8rem;list-style: none;position: relative;padding-left: 1.5rem;}
-    ul li::before {content: "✔";color: var(--accent);position: absolute;left: 0;}
-    .progress-bar {background:#ddd;border-radius:5px;overflow:hidden;height:20px;margin-top:10px;}
-    .progress-fill {background:var(--accent);width:0;height:100%;transition:width 1s ease;}
-    footer {text-align:center;font-size:0.8rem;color:#888;padding:1rem;}
-    @media(max-width:768px){nav .links{display:none;}#menuToggle{display:flex;}}
-    #authSection {display:none;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HabitLoop - Build & Break Habits</title>
+<style>
+  * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+  body {
+    background: linear-gradient(-45deg,#1a1a2e,#16213e,#0f3460,#533483);
+    background-size: 400% 400%;
+    animation: bgMove 12s ease infinite;
+    color:#eee; min-height:100vh; display:flex; flex-direction:column;
+  }
+  @keyframes bgMove {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+  header {
+    text-align:center;
+    padding:25px;
+    font-size:28px;
+    font-weight:bold;
+    color:#fff;
+    text-shadow:0 0 15px #00f7ff;
+  }
+  .screen {display:none; flex:1; justify-content:center; align-items:center; flex-direction:column; text-align:center;}
+  .active {display:flex;}
+  .btn {
+    background:#00f7ff;
+    border:none; color:#111; padding:15px 25px; border-radius:40px;
+    font-size:18px; margin-top:20px; cursor:pointer;
+    box-shadow:0 0 20px #00f7ff;
+    animation:pulse 2s infinite;
+    transition:transform .3s;
+  }
+  .btn:hover {transform:scale(1.1);}
+  @keyframes pulse {0%,100%{box-shadow:0 0 20px #00f7ff;}50%{box-shadow:0 0 40px #00f7ff;}}
+  .modal {
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:5;
+  }
+  .modal-content {
+    background:#16213e; padding:30px; border-radius:15px; width:300px; text-align:center;
+    box-shadow:0 0 30px #00f7ff; animation:fadeIn .5s;
+  }
+  input {
+    width:90%;padding:10px;margin:10px 0;border:none;border-radius:8px;
+    background:#0f3460;color:#fff;
+  }
+  .habits-nav {
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;
+  }
+  .habits-nav button {
+    background:#533483;color:#fff;border:none;padding:12px 20px;border-radius:25px;
+    box-shadow:0 0 10px #533483;cursor:pointer;transition:.3s;
+  }
+  .habits-nav button:hover {transform:scale(1.1);background:#6c4ab6;}
+  section {
+    display:none;background:#0f3460;padding:20px;border-radius:15px;max-width:700px;
+    margin:auto;color:#eee;box-shadow:0 0 20px #00f7ff;animation:fadeIn .6s;
+  }
+  section.active {display:block;}
+  h2 {color:#00f7ff;margin-bottom:10px;}
+  ul {padding-left:20px;text-align:left;}
+  li {margin-bottom:10px;font-size:16px;}
+  a {color:#ff4d6d;text-decoration:none;}
+  a:hover {text-decoration:underline;}
+  .logout-btn {
+    background:#ff4d6d;color:#fff;border:none;padding:10px 20px;border-radius:20px;
+    margin-top:30px;cursor:pointer;box-shadow:0 0 10px #ff4d6d;transition:.3s;
+  }
+  .logout-btn:hover {transform:scale(1.1);}
+  @keyframes fadeIn {from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+</style>
 </head>
 <body>
-  <nav>
-    <div style="font-weight:bold;">HabitLoop</div>
-    <div class="links">
-      <a href="#home">Home</a>
-      <a href="#habits">Habits</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#journal">Journal</a>
-      <button id="logoutBtn" style="display:none;">Logout</button>
-      <button id="themeToggle">Theme</button>
-    </div>
-    <div id="menuToggle"><div></div><div></div><div></div></div>
-    <div class="mobileMenu" id="mobileMenu">
-      <a href="#home">Home</a>
-      <a href="#habits">Habits</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#journal">Journal</a>
-      <button id="themeToggleMobile">Theme</button>
-      <button id="logoutBtnMobile" style="display:none;">Logout</button>
-    </div>
-  </nav>
 
-  <!-- Authentication -->
-  <section id="authSection">
-    <h2 id="authTitle">Login</h2>
-    <input type="text" id="username" placeholder="Username"><br>
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <button onclick="handleAuth()">Submit</button><br>
-    <p id="authMsg"></p>
-    <button onclick="toggleAuthMode()">Switch to Sign Up</button>
-  </section>
+<header>HabitLoop - Build Good Habits, Break Bad Ones</header>
 
-  <!-- Main content (hidden until logged in) -->
-  <div id="mainContent" style="display:none;">
-    <section id="home">
-      <h1>Welcome to HabitLoop</h1>
-      <p>Use science-backed steps to build good habits and break bad ones.</p>
-    </section>
+<!-- Home Screen -->
+<div id="homeScreen" class="screen active">
+  <h1 style="animation:fadeIn 2s;">Welcome to HabitLoop</h1>
+  <p style="margin-top:10px;max-width:400px;animation:fadeIn 3s;">
+    Transform your life by building powerful habits and breaking harmful ones.
+  </p>
+  <button class="btn" onclick="openModal()">Get Started</button>
+</div>
 
-    <section id="habits">
-      <h2>Select a Habit</h2>
-      <select id="habitSelect">
-        <option value="">-- Choose a Habit --</option>
-        <optgroup label="Good Habits">
-          <option value="reading">Reading Daily</option>
-          <option value="exercise">Exercising</option>
-          <option value="waking">Waking Up Early</option>
-        </optgroup>
-        <optgroup label="Bad Habits">
-          <option value="drugs">Drug Addiction</option>
-          <option value="porn">Porn Addiction</option>
-          <option value="risky">Risky Sexual Behavior</option>
-        </optgroup>
-      </select>
-      <div class="card" id="habitGuide"></div>
-    </section>
+<!-- Login/Signup Modal -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <h2>Sign Up / Log In</h2>
+    <input type="text" id="username" placeholder="Enter Name">
+    <input type="password" id="password" placeholder="Enter Password">
+    <button class="btn" style="animation:none;" onclick="login()">Continue</button>
+  </div>
+</div>
 
-    <section id="dashboard">
-      <h2>Your Progress Dashboard</h2>
-      <div id="progressList"></div>
-    </section>
-
-    <section id="journal">
-      <h2>Your Journal</h2>
-      <textarea id="journalEntry" rows="6" placeholder="Write your thoughts..."></textarea><br>
-      <button onclick="saveJournal()">Save</button>
-      <p id="saveMsg" style="color:var(--accent);"></p>
-    </section>
+<!-- Dashboard -->
+<div id="dashboard" class="screen">
+  <div class="habits-nav">
+    <button onclick="showSection('reading')">📖 Reading</button>
+    <button onclick="showSection('journaling')">📝 Journaling</button>
+    <button onclick="showSection('drugs')">🚫 Quit Drugs</button>
+    <button onclick="showSection('porn')">🚫 Quit Porn</button>
+    <button onclick="showSection('risky')">⚠ Risky Behavior</button>
   </div>
 
-  <footer>HabitLoop © 2025</footer>
+  <section id="reading">
+    <h2>Build a Habit of Reading</h2>
+    <p>If you want to build a habit of reading, here’s what you should do:</p>
+    <ul>
+      <li><b>Make it Obvious:</b> Place books where you see them daily.</li>
+      <li><b>Make it Attractive:</b> Pair reading with music or tea.</li>
+      <li><b>Make it Easy:</b> Read just 2 pages a day.</li>
+      <li><b>Make it Satisfying:</b> Track your streak and reward progress.</li>
+    </ul>
+  </section>
 
-  <script>
-    let isLogin = true;
-    const habits = {
-      reading:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
-      exercise:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
-      waking:{plan:["Make it Obvious","Make it Attractive","Make it Easy","Make it Satisfying"],streak:0},
-      drugs:{plan:["Make it Invisible","Make it Unattractive","Make it Difficult","Make it Unsatisfying"],streak:0},
-      porn:{plan:["Make it Invisible","Use Blockers","Make it Difficult","Make it Unsatisfying"],streak:0},
-      risky:{plan:["Make it Invisible","See STI Risks","Make it Difficult","Make it Unsatisfying"],streak:0}
-    };
+  <section id="journaling">
+    <h2>Build a Habit of Journaling</h2>
+    <p>If you want to build a habit of journaling, here’s what you should do:</p>
+    <ul>
+      <li><b>Make it Obvious:</b> Keep your journal by your bed.</li>
+      <li><b>Make it Attractive:</b> Use a notebook and pen you enjoy.</li>
+      <li><b>Make it Easy:</b> Write one line if busy.</li>
+      <li><b>Make it Satisfying:</b> Reflect weekly to stay motivated.</li>
+    </ul>
+  </section>
 
-    function toggleAuthMode(){
-      isLogin = !isLogin;
-      document.getElementById('authTitle').textContent = isLogin ? "Login" : "Sign Up";
-      document.querySelector('#authSection button:last-of-type').textContent = isLogin ? "Switch to Sign Up" : "Switch to Login";
-    }
+  <section id="drugs">
+    <h2>Break Drug Addiction</h2>
+    <p>If you want to quit drugs, apply these reverse rules:</p>
+    <ul>
+      <li><b>Make it Invisible:</b> Avoid triggers and suppliers.</li>
+      <li><b>Make it Unattractive:</b> List the harm done and read daily.</li>
+      <li><b>Make it Hard:</b> Get accountability and remove access.</li>
+      <li><b>Make it Unsatisfying:</b> Replace highs with healthy rewards.</li>
+    </ul>
+  </section>
 
-    function handleAuth(){
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const msg = document.getElementById('authMsg');
-      if(!email || !password){msg.textContent="Please fill all fields.";return;}
-      if(isLogin){
-        const stored = JSON.parse(localStorage.getItem('user'));
-        if(stored && stored.email===email && stored.password===password){
-          loginSuccess();
-        } else {
-          msg.textContent="Invalid login details.";
-        }
-      } else {
-        const username=document.getElementById('username').value;
-        if(!username){msg.textContent="Enter username.";return;}
-        localStorage.setItem('user',JSON.stringify({username,email,password}));
-        msg.textContent="Account created! You can now login.";
-        toggleAuthMode();
-      }
-    }
+  <section id="porn">
+    <h2>Break Porn Addiction</h2>
+    <p>If you want to quit porn, follow these steps:</p>
+    <ul>
+      <li><b>Make it Invisible:</b> Use <a href="https://blockerx.org" target="_blank">BlockerX</a>.</li>
+      <li><b>Make it Unattractive:</b> Learn its effects on brain and relationships.</li>
+      <li><b>Make it Hard:</b> Use accountability tools.</li>
+      <li><b>Make it Unsatisfying:</b> Track clean streaks and reward progress.</li>
+    </ul>
+  </section>
 
-    function loginSuccess(){
-      document.getElementById('authSection').style.display="none";
-      document.getElementById('mainContent').style.display="block";
-      document.getElementById('logoutBtn').style.display="inline-block";
-      document.getElementById('logoutBtnMobile').style.display="inline-block";
-    }
+  <section id="risky">
+    <h2>Avoid Risky Sexual Behavior</h2>
+    <p>Before risky behaviors, consider this:</p>
+    <ul>
+      <li>See STI awareness images: <a href="https://clarewellclinics.co.uk/sti/symptoms/pictures/" target="_blank">View Images</a>.</li>
+      <li><b>Make it Unattractive:</b> Visualize risks and consequences.</li>
+      <li><b>Make it Hard:</b> Avoid high-risk places.</li>
+      <li><b>Make it Unsatisfying:</b> Think long-term before acting.</li>
+    </ul>
+  </section>
 
-    document.getElementById('logoutBtn').addEventListener('click',logout);
-    document.getElementById('logoutBtnMobile').addEventListener('click',logout);
-    function logout(){
-      document.getElementById('authSection').style.display="block";
-      document.getElementById('mainContent').style.display="none";
-      document.getElementById('logoutBtn').style.display="none";
-      document.getElementById('logoutBtnMobile').style.display="none";
-    }
+  <button class="logout-btn" onclick="logout()">Log Out</button>
+</div>
 
-    function saveJournal(){
-      localStorage.setItem('habitJournal',document.getElementById('journalEntry').value);
-      document.getElementById('saveMsg').textContent='Journal saved!';
-      setTimeout(()=>{document.getElementById('saveMsg').textContent='';},2000);
-    }
+<audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
 
-    // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click',()=>document.body.classList.toggle('dark'));
-    document.getElementById('themeToggleMobile').addEventListener('click',()=>document.body.classList.toggle('dark'));
+<script>
+  function openModal(){document.getElementById('authModal').style.display='flex';playClick();}
+  function login(){
+    document.getElementById('authModal').style.display='none';
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('dashboard').classList.add('active');
+    playClick();
+  }
+  function logout(){
+    document.getElementById('dashboard').classList.remove('active');
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('homeScreen').classList.add('active');
+    playClick();
+  }
+  function showSection(id){
+    document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    playClick();
+  }
+  function playClick(){document.getElementById('clickSound').play();}
+</script>
 
-    // Mobile menu
-    document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));
-
-    // Show login first if not logged in
-    document.getElementById('authSection').style.display="block";
-  </script>
 </body>
   </html>
